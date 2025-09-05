@@ -6,36 +6,43 @@ RPN::RPN(char *str_array){ //str_array = av[1]
     int flag = 0;
     std::string str = str_array;
     std::istringstream ss(str);
-    char token;
-    std::cout << "Token print << " << std::endl;
+    std::string token;
+
+    if(str.length() == 0 || str == " ") throw EmptyArgException();
+    else if(str.find("\(") != std::string::npos || str.find(")") != std::string::npos) throw BracketException();
+    else if(str.find("+") == std::string::npos && 
+            str.find("-") == std::string::npos &&
+            str.find("*") == std::string::npos &&
+            str.find("/") == std::string::npos)
+        throw NoOperatorException();
+    // else{
+    //      for (int i = 0; i <= 9; i++)
+    //         str.find(i + '0') == std::string::npos ? throw NoNumberException() : 0;
+    // }
+       
+    // std::cout << "Token print << " << std::endl;
     while (ss >> token){ //read token by token
         // std::cout << token << " ";
 
         // check if the second token is number
-        if(flag == 1 && (token == '+' || token == '-' || token == '*' || token == '/')){
+        if(flag == 1 && (token == "+" || token == "-" || token == "*" || token == "/"))
             throw ArgumentValueException();
-        }
+        else if(token.length() > 1 && (atoi(token.c_str()) < 0 || atoi(token.c_str()) >= 10)) throw ValueLimitException();
+        else if (token.length() > 1)throw FormatException();
         else{
-            //  std::cout << "token " << token <<  std::endl;
-            if(token == '+' || token == '-' || token == '*' || token == '/' ){
-                do_operation(token);
-            }
+            if(token == "+" || token == "-" || token == "*" || token == "/" )
+                do_operation(token[0]);
             else{
-                // std::cout << "token for push << " << token - '0' << std::endl;
-                // std::cout << rpn_stack.top() << std::endl;
-                this->rpn_stack.push(token - '0');
+                // std::cout << "token for push << " << token  << std::endl;
+                this->rpn_stack.push(token[0] - '0');
+                // print_stack();
             }
-                
         }
         flag++;
     }
-    // std::cout << "--- stack loop ---" << std::endl;
-    // while(!rpn_stack.empty()){
-    //     // std::cout << "\nrpn stack top << " << rpn_stack.top() << std::endl;
-    //     rpn_stack.pop();
-    // }
-        
-    std::cout << "\nrpn stack top << " << rpn_stack.top() << std::endl;
+    if(rpn_stack.size() > 1)
+        throw StackOverloadException();
+    std::cout << "\nrpn result << " << rpn_stack.top() << std::endl;
 }
 
 RPN::~RPN(){}
@@ -49,47 +56,41 @@ RPN& RPN::operator=(const RPN &other){
     return *this;
 }
 
-void RPN::add(){
-    int temp;
-    temp = rpn_stack.top();
-    rpn_stack.pop();
-    temp += rpn_stack.top();
-    rpn_stack.pop();
-    rpn_stack.push(temp);
-    // std::cout << "result << " << temp << std::endl;
-    print_stack();
-}
-
-void RPN::subtract(){
-    int top = rpn_stack.top();
-    rpn_stack.pop();
-    int sec_top = rpn_stack.top();
-    rpn_stack.push(sec_top - top);
-    print_stack();
-}
-
 void RPN::do_operation(char token){
-    // int secTop;
-    // int top;
-
-    //////////////
+    if(rpn_stack.size() < 2)
+        throw StackSizeException();
+    int newTop;
+    int firstTop = this->rpn_stack.top();
+    this->rpn_stack.pop();
+    int secTop = this->rpn_stack.top();
+    this->rpn_stack.pop();
+  
     switch (token)
     {
     case '+':
-        add();
+        newTop = secTop + firstTop;
         break;
     case '-':
-        subtract();
+        newTop = secTop - firstTop;
+        break;
+    case '*':
+        newTop = secTop * firstTop;
+        break;
+    case '/':
+        if(firstTop == 0)
+            throw DivideByZeroException();
+        newTop = secTop / firstTop;
         break;
     default:
         break;
     }
-   
+    this->rpn_stack.push(newTop);
+    // print_stack();
 }
 
 void RPN::print_stack(){
     std::stack<int> temp_stack = rpn_stack;
-    std::cout << "--- stack loop ---" << std::endl;
+    std::cout << "--- stack print ---" << std::endl;
     while(!temp_stack.empty()){
         std::cout << temp_stack.top() << " ";
         temp_stack.pop();
