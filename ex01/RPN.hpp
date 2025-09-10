@@ -19,6 +19,7 @@ class RPN{
         RPN(const RPN &other);
         RPN& operator=(const RPN &other);
         void print_stack();
+        int check_if_digit(std::string token);
 
 };
 

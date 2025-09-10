@@ -1,2 +1,0 @@
-- apply the ford johnson with jacobsthal using vector and deque
-- time calculation

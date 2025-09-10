@@ -4,8 +4,12 @@ int main(int ac, char** av){
     
     try
     {
-       PmergeMe pmerge;
-        pmerge.execute(ac, av);
+        if(ac > 1){
+            PmergeMe pmerge;
+            pmerge.execute(ac, av);
+        }
+        else
+            throw ArgumentNotEnough();
     }
     catch(const std::exception& e)
     {

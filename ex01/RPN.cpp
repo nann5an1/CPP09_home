@@ -15,34 +15,22 @@ RPN::RPN(char *str_array){ //str_array = av[1]
             str.find("*") == std::string::npos &&
             str.find("/") == std::string::npos)
         throw NoOperatorException();
-    // else{
-    //      for (int i = 0; i <= 9; i++)
-    //         str.find(i + '0') == std::string::npos ? throw NoNumberException() : 0;
-    // }
        
-    // std::cout << "Token print << " << std::endl;
     while (ss >> token){ //read token by token
-        // std::cout << token << " ";
-
         // check if the second token is number
-        if(flag == 1 && (token == "+" || token == "-" || token == "*" || token == "/"))
-            throw ArgumentValueException();
+        if(flag == 1 && (token == "+" || token == "-" || token == "*" || token == "/")) throw ArgumentValueException();
         else if(token.length() > 1 && (atoi(token.c_str()) < 0 || atoi(token.c_str()) >= 10)) throw ValueLimitException();
         else if (token.length() > 1)throw FormatException();
         else{
             if(token == "+" || token == "-" || token == "*" || token == "/" )
                 do_operation(token[0]);
-            else{
-                // std::cout << "token for push << " << token  << std::endl;
-                this->rpn_stack.push(token[0] - '0');
-                // print_stack();
-            }
+            else if(!check_if_digit(token)) throw NoNumberException(); //check if token is digit or not
+            else this->rpn_stack.push(token[0] - '0');
         }
         flag++;
     }
-    if(rpn_stack.size() > 1)
-        throw StackOverloadException();
-    std::cout << "\nrpn result << " << rpn_stack.top() << std::endl;
+    if(rpn_stack.size() > 1) throw StackOverloadException();
+    std::cout << rpn_stack.top() << std::endl;
 }
 
 RPN::~RPN(){}
@@ -86,6 +74,14 @@ void RPN::do_operation(char token){
     }
     this->rpn_stack.push(newTop);
     // print_stack();
+}
+
+int RPN::check_if_digit(std::string token){
+    for(size_t i = 0; i < token.length(); ++i){
+            if(!isdigit(token[i]))
+                return 0;
+    }
+    return 1;
 }
 
 void RPN::print_stack(){
