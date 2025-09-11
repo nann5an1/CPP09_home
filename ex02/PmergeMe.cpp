@@ -3,7 +3,31 @@
 PmergeMe::PmergeMe(){}
 PmergeMe::~PmergeMe(){}
 PmergeMe::PmergeMe(const PmergeMe &other){ *this = other; }
-PmergeMe& PmergeMe::operator=(const PmergeMe &other){ if(this != &other) (void)other; return *this; }
+
+PmergeMe& PmergeMe::operator=(const PmergeMe &other) { 
+    if (this != &other) {
+        pairs = other.pairs;
+        sorted_pairs = other.sorted_pairs;
+        vec = other.vec;
+        input_vec = other.input_vec;
+        main_chaine = other.main_chaine;
+        pending_chaine = other.pending_chaine;
+        original_pending = other.original_pending;
+        original_main = other.original_main;
+        sorted_main_chaine = other.sorted_main_chaine;
+        deq = other.deq;
+    }
+    return *this;
+}
+
+
+int PmergeMe::n_comparisons = 0;
+
+bool    PmergeMe::comparison_count(int a, int b)
+{
+    ++n_comparisons;
+    return a < b;
+}
 
 int PmergeMe::duplicate_check(std::vector<int> &input_vec){
     std::vector<int> temp_vec = input_vec;
@@ -48,19 +72,23 @@ void PmergeMe::execute(int ac, char **av){
     sort_container(deq);
     double end_time_deq = get_time_microseconds();
     double duration_deq = end_time_deq - start_time_deq;
+    // std::cout << "n_comparisons: " << n_comparisons << "\n";
 
     /////////////////// vector sorting /////////////////////////////
 
+    n_comparisons = 0;
     double start_time_vec = get_time_microseconds();
     sort_container(vec);
     double end_time_vec = get_time_microseconds();
     double duration_vec = end_time_vec - start_time_vec;
+    // std::cout << "n_comparisons: " << n_comparisons << "\n";
     
 
     //////////////////////// final output time comparisons //////////////////////
     print_container(input_vec);
     final_flag = 1;
     print_container(sorted_main_chaine);
+    // assert(std::is_sorted(sorted_main_chaine.begin(), sorted_main_chaine.end()));
     time_comparision_output(duration_deq, duration_vec);
 }
 
@@ -170,8 +198,12 @@ void PmergeMe::sort_container(T& container){
 
    
     // print_container(sorted_main_chaine);
+
 }
+
+
 
 // explicit instantiations
 template void PmergeMe::sort_container<std::vector<int> >(std::vector<int>&);
 template void PmergeMe::sort_container<std::deque<int> >(std::deque<int>&);
+

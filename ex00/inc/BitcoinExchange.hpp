@@ -36,4 +36,11 @@ class FormatException : public std::exception{
         }
 };
 
+class FailedToOpenException : public std::exception{
+    public:
+        const char* what() const throw(){
+            return ("FailedToOpenException: Failed to Open File.");
+        }
+};
+
 #endif

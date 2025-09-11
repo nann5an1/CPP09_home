@@ -18,20 +18,14 @@ void BitcoinExchange::run(char *filename){
     std::fstream file, input_file;
     
     file.open("data.csv", std::ios::in);
-    if (!file.is_open()){
-        std::cerr << "Failed to open file\n";
-        return ;
-    }
+    if (!file.is_open()) throw FailedToOpenException();
 
     //taking the csv file into the map
     map_input(file, line, map_db);
 
     //read the input txt file
     input_file.open(filename);
-    if(input_file.fail()){
-        std::cerr << "File does not exist\n";
-        return ;
-    }
+    if(input_file.fail()) throw FailedToOpenException();
     read_file_input(input_file, input_line, map_db);
 }
 
@@ -59,8 +53,7 @@ void BitcoinExchange::read_file_input(std::fstream &input_file, std::string &inp
     std::string token;
 
    std::getline(input_file, input_line);
-    if (input_line.find("date | value") == std::string::npos)
-        throw FormatException();
+    if (input_line.find("date | value") == std::string::npos) throw FormatException();
 
     //read input file
     while(std::getline(input_file, input_line)){
@@ -73,18 +66,19 @@ void BitcoinExchange::read_file_input(std::fstream &input_file, std::string &inp
             continue;
         }
         bool_date = identify_date(date_token);
-
-        if(!bool_date) std::cout << "Error: bad input => " << input_line << std::endl;
-
-       
         value_ret = value_check(value_str);
-        if(bool_date){
+
+        if(!bool_date ) std::cout << "Error: bad input => " << input_line << std::endl;
+        if(sep != "|")  std::cout << "Error: bad input => " << input_line << std::endl;
+        else if(bool_date && sep == "|"){
             if(value_ret == -1) std::cout << "Error: not a positive number." << std::endl;                 
             else if(value_ret == -2) std::cout << "Error: too large a number." << std::endl;    
             else if (value_ret == 0) std::cout << "Error: value not within range." << std::endl;
             else if (value_ret == -3) std::cout << "Error: not a digit value." << std::endl;
             else if(bool_date) map_iteration(map_db, date_token, atoi(value_str.c_str()));
         }
+        // else
+        //     std::cout << "Error: bad input => " << input_line << std::endl;
     }
 }
 
@@ -104,7 +98,8 @@ int BitcoinExchange::identify_date(std::string token){
 int BitcoinExchange::value_check(std::string token){
 
     for(size_t i = 0; i < token.length(); ++i){
-        if(!isdigit(token[i])) return -3;
+        if(token[i] == '.') continue;
+        else if(!isdigit(token[i])) return -3;
     }
     double value = strtod(token.c_str(), NULL);
     

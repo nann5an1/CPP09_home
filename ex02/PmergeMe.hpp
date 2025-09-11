@@ -1,6 +1,7 @@
 #ifndef PMERGEME_HPP
 # define PMERGEME_HPP
 
+#include <cassert>
 #include <algorithm>
 #include <stdlib.h>
 #include <iomanip>
@@ -22,7 +23,7 @@ class PmergeMe {
         main_chaine, pending_chaine, original_pending, 
         original_main, sorted_main_chaine;
         std::deque<int> deq;
-
+        static int  n_comparisons;
     public:
         PmergeMe();
         ~PmergeMe();
@@ -34,6 +35,7 @@ class PmergeMe {
         std::vector<int> generate_sequence();
         void time_comparision_output(double duration_deq, double duration_vec);
         int duplicate_check(std::vector<int> &input_vec);
+        static bool    comparison_count(int a, int b);
 
         // print helpers
         template <typename T>
@@ -82,7 +84,7 @@ class PmergeMe {
             T sorted_main = ford_johnson(bigger_elements);
 
             for (typename T::iterator it = smaller_elements.begin(); it != smaller_elements.end(); ++it) {
-                typename T::iterator pos = std::lower_bound(sorted_main.begin(), sorted_main.end(), *it);
+                typename T::iterator pos = std::lower_bound(sorted_main.begin(), sorted_main.end(), *it, comparison_count);
                 sorted_main.insert(pos, *it);
             }
             return sorted_main;
@@ -157,7 +159,7 @@ class PmergeMe {
     
         template <typename T>
         void binary_insertion_sort(T& container, int value_to_insert) {
-            typename T::iterator pos = std::lower_bound(container.begin(), container.end(), value_to_insert);
+            typename T::iterator pos = std::lower_bound(container.begin(), container.end(), value_to_insert, comparison_count);
             container.insert(pos, value_to_insert);
         }
 
