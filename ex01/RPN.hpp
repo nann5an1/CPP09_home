@@ -7,10 +7,11 @@
 #include <stack>
 #include <sstream>
 #include <algorithm>
+#include <limits.h>
 
 class RPN{
     private:
-        std::stack<int> rpn_stack;
+        std::stack<long> rpn_stack;
         void do_operation(char token);
     public:
         RPN();
@@ -41,6 +42,13 @@ class ValueLimitException: public std::exception{
     public:
         const char* what() const throw(){
             return ("ValueLimitException: Value must be range between 0 to 9.");
+        }
+};
+
+class IntValException: public std::exception{
+    public:
+        const char* what() const throw(){
+            return ("IntValException: Value not within INT range");
         }
 };
 

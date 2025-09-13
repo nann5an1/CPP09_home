@@ -30,6 +30,7 @@ RPN::RPN(char *str_array){ //str_array = av[1]
         flag++;
     }
     if(rpn_stack.size() > 1) throw StackOverloadException();
+    if(rpn_stack.top() > INT_MAX) throw IntValException();
     std::cout << rpn_stack.top() << std::endl;
 }
 
@@ -47,10 +48,10 @@ RPN& RPN::operator=(const RPN &other){
 void RPN::do_operation(char token){
     if(rpn_stack.size() < 2)
         throw StackSizeException();
-    int newTop;
-    int firstTop = this->rpn_stack.top();
+    long newTop;
+    long firstTop = this->rpn_stack.top();
     this->rpn_stack.pop();
-    int secTop = this->rpn_stack.top();
+    long secTop = this->rpn_stack.top();
     this->rpn_stack.pop();
   
     switch (token)
@@ -85,7 +86,7 @@ int RPN::check_if_digit(std::string token){
 }
 
 void RPN::print_stack(){
-    std::stack<int> temp_stack = rpn_stack;
+    std::stack<long> temp_stack = rpn_stack;
     std::cout << "--- stack print ---" << std::endl;
     while(!temp_stack.empty()){
         std::cout << temp_stack.top() << " ";

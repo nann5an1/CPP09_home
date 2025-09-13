@@ -17,7 +17,7 @@ class BitcoinExchange{
         std::map <std::string, double> map_db;
         int value_check(std::string token);
         int identify_date(std::string token);
-        void map_iteration(std::map <std::string, double> &map_db, std::string &date_token, int val_token);
+        void map_iteration(std::map <std::string, double> &map_db, std::string &date_token, std::string val_token);
         void map_input(std::fstream &file, std::string &line, std::map<std::string, double> &map_db);
         void read_file_input(std::fstream &input_file, std::string &input_line, std::map<std::string, double> map_db);
     public:

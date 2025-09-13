@@ -75,10 +75,9 @@ void BitcoinExchange::read_file_input(std::fstream &input_file, std::string &inp
             else if(value_ret == -2) std::cout << "Error: too large a number." << std::endl;    
             else if (value_ret == 0) std::cout << "Error: value not within range." << std::endl;
             else if (value_ret == -3) std::cout << "Error: not a digit value." << std::endl;
-            else if(bool_date) map_iteration(map_db, date_token, atoi(value_str.c_str()));
+            else if (value_ret == -4) std::cout << "Error: multiple decimals found." << std::endl;
+            else if(bool_date) map_iteration(map_db, date_token, value_str);
         }
-        // else
-        //     std::cout << "Error: bad input => " << input_line << std::endl;
     }
 }
 
@@ -96,22 +95,29 @@ int BitcoinExchange::identify_date(std::string token){
 }
 
 int BitcoinExchange::value_check(std::string token){
-
-    for(size_t i = 0; i < token.length(); ++i){
-        if(token[i] == '.') continue;
-        else if(!isdigit(token[i])) return -3;
-    }
     double value = strtod(token.c_str(), NULL);
     
     if(value > INT_MAX || value < INT_MIN) return -2;
     else if (value > 1000) return 0;
     else if(value < 0) return -1;
+
+    int decimal = 0;
+    for(size_t i = 0; i < token.length(); ++i){
+        if(token[i] == '.'){
+            if(decimal)
+                return -4;
+            decimal = 1;
+            continue;
+        } 
+        else if(!isdigit(token[i])) return -3;
+    }
+    
     return 1;
 }
 
-void BitcoinExchange::map_iteration(std::map<std::string, double>& map_db, std::string& token, int value) {
+void BitcoinExchange::map_iteration(std::map<std::string, double>& map_db, std::string& token, std::string value_str) {
     std::map<std::string, double>::iterator it = map_db.lower_bound(token);
-
+    double value = strtod(value_str.c_str(), NULL);
     if (it == map_db.begin() && (it == map_db.end() || it->first != token)) {
         std::cout << "No earlier date available for " << token << std::endl;
         return;
@@ -119,8 +125,8 @@ void BitcoinExchange::map_iteration(std::map<std::string, double>& map_db, std::
     // no exact match so step back to nearest lower date
     if (it == map_db.end() || it->first != token)
         --it;
-
-    std::cout << token << " => " << value << " = "
+    
+    std::cout << token << " => " << value_str << " = "
               << std::fixed << std::setprecision(2) << (it->second * value)
               << std::endl;
 }
